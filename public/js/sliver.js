@@ -6,8 +6,6 @@ String.prototype.format = function() {
 	});
 };
 var scHandler = {
-	apiUserSearchUrl : "http://api.soundcloud.com/users.json?callback=?&client_id=3818f234c5565fd0c330e96416c129cb&q={0}",
-	apiUserTracksUrl : "http://api.soundcloud.com/users/{0}/tracks.json?callback=?&client_id=3818f234c5565fd0c330e96416c129cb",
 	getMediaLink : function(trackData, callback) {
 		$.ajax({
 			url : trackData.permalink_url,
@@ -39,7 +37,7 @@ var scHandler = {
 	},
 	getSliver : function(url) {
 		var proxyUrl = "./php/proxy.php?url=" + url + "&mode=native";
-		
+
 		// Load asynchronously
 		var request = new XMLHttpRequest();
 		request.open("GET", proxyUrl, true);
@@ -49,7 +47,7 @@ var scHandler = {
 		this.request = request;
 
 		request.onprogress = function(ev) {
-			
+
 		};
 
 		request.onload = function() {
@@ -73,18 +71,17 @@ var scHandler = {
 $(document).ready(function() {
 	$("#usernameTextInput").autocomplete({
 		source : function(request, response) {
-			$.ajax({
-				url : scHandler.apiUserSearchUrl.format(request.term),
-				dataType : "json",
-				success : function(users) {
-					response($.map(users, function(user) {
-						return {
-							label : user.username,
-							value : user.username,
-							id : user.id
-						}
-					}));
-				}
+			$.getJSON('http://api.soundcloud.com/users.json', {
+				q : request.term,
+				client_id : '3818f234c5565fd0c330e96416c129cb'
+			}).done(function(users) {
+				response($.map(users, function(user) {
+					return {
+						label : user.username,
+						value : user.username,
+						id : user.id
+					}
+				}));
 			});
 		},
 		minLength : 2,
